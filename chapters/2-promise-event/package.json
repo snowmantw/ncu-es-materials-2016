@@ -1,0 +1,14 @@
+{
+  "name": "2-runtime-async",
+  "version": "1.0.0",
+  "description": "@GregWeng 2016 NCU",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^3.5.0"
+  }
+}
