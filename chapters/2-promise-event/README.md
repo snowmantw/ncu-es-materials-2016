@@ -4,7 +4,7 @@
 
 ---
 
-## Goal
+## Chapter Goal
 
 Help you to understand how to develop and debug the asynchronous programming **with the low-level Promise API**.
 
@@ -115,7 +115,6 @@ It must be constructed with a function as argument:
       var promise = new Promise();
     });
 ```
-
 ---
 
 And the API will check the type of it:
@@ -135,7 +134,7 @@ And the API will check the type of it:
 The most important is, the function will execute **immediately**:
 
 ```javascript
-    it('the function argument of Promise will execute immediately'
+    it('the function argument of Promise will execute immediately',
     function() {
       debugger;
       var assert = require('chai').assert;
@@ -157,10 +156,23 @@ It is a common mistake that developers think the function argument of a `Promise
 
 ---
 
-Don't get confused with the function argument and the asynchronous computation **inside its body**:
+Remember the diagram explains the event-loop in mind:
+
+<img style="max-width: 500px" src="http://exploringjs.com/es6/images/async----event_loop.jpg" />
+
+---
+
+The asynchronous callback inside the `Promise` constructor will be queued, but the constructor function itself,
+is **on the stack** and will execute immediately.
+
+<img style="max-width: 500px" src="http://exploringjs.com/es6/images/async----event_loop.jpg" />
+
+---
+
+Therefore, don't get confused with the function argument and the asynchronous computation **inside its body**:
 
 ```javascript
-    it('the function argument is with an asynchronous computation'
+    it('the function argument is an asynchronous computation',
     function(done) {
       debugger;
       var assert = require('chai').assert;
@@ -177,15 +189,19 @@ Don't get confused with the function argument and the asynchronous computation *
       // Since the `setTimeout` will execute after all the synchronous statements,
       // this will be incorrect:
       assert(logs[0], 'in the Promise constructor');
-      assert(logs[1], 'after creating the Promise');
+      assert(logs[1], 'after creating the Promise',
+      'this failure shows that synchronous computation first');
     });
 ```
 
 [promise-spec]: http://www.ecma-international.org/ecma-262/6.0/#sec-constructor-properties-of-the-global-object-promise
 
+[01-promise-basic.es](# "save: ")
+
 ---
 
-### Weave native APIs with Promise
+
+### Weave native APIs into Promise
 
 Most of Node.js and some legacy DOM APIs, the convention to allow developer continue the computation after an asynchronous function is to provide a callback:
 
@@ -261,9 +277,11 @@ the annoyed anonymous function could be eliminated.
 
 Following section will elaborate `then` and `catch` in detail.
 
+[02-promise-and-callback.es](# "save: ")
+
 ---
 
-### Control flow with Promise
+### Control flow and Promise
 
 A `Promise` can construct the flow by its `then` and `catch`:
 
@@ -296,6 +314,8 @@ A `Promise` can construct the flow by its `then` and `catch`:
       });
     });
 ```
+
+[03-promise-control-flow.es](# "save: ")
 
 ---
 
@@ -393,6 +413,8 @@ In the following chapters, it will show how useful this trick is, especially whe
 [node-q]: https://github.com/kriskowal/q/wiki/API-Reference
 [node-bluebird]: http://bluebirdjs.com/docs/api/deferred-migration.html
 
+[04-promise-resolving.es](# "save: ")
+
 ---
 
 #### Then, catch and exception
@@ -459,6 +481,8 @@ It is an interesting and important **quiz**: what happen to those `then`(s) *aft
     });
 ```
 
+[05-promise-then-catch.es](# "save: ")
+
 ---
 
 #### Nested Promises
@@ -487,6 +511,7 @@ III. If a `then` return a `Promise`, then the following `then`(s) won't execute 
 
 It is essential to know how to concate other `Promise`(s) in another one like this, since usually there are lots of asynchronous methods returning `Promise` that need to be organized via the main control-flow, which is usually another `Promise`.
 
+[06-nested-promises.es](# "save: ")
 ---
 
 #### Interruption from exception
@@ -576,6 +601,8 @@ Without the re-throwing it will NOT interrupt the flow after the error:
 ```
 
 And yes, as the example shows, it is also critical to know how to concate one `Promise` after another one:
+
+[07-promise-interruption.es](# "save: ")
 
 ---
 
@@ -677,6 +704,8 @@ The following **quiz** will fail because it won't work without using the updated
     });
 ```
 
+---
+
 It is even possible to concate new steps in a loop:
 
 ```javascript
@@ -703,6 +732,9 @@ It is even possible to concate new steps in a loop:
         done(error);
       });
     });
+```
+
+[08-promise-extending.es](# "save: ")
 
 ---
 
@@ -738,6 +770,8 @@ All the caveats of `Promise` list above. The rest are some useful APIs in summar
 [promise-spec]: http://www.ecma-international.org/ecma-262/6.0/#sec-promise-constructor
 [promise-all]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
 [promise-resolve]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve
+
+[09-promise-rejection.es](# "save: ")
 
 ---
 
@@ -817,6 +851,15 @@ For example, this is a typical snippet to handle reading data from a stream, it 
     reader.start();
 
 ```
+
+[10-promise-event-full-example.es](# "save: ")
+
+---
+
+This example comprises all the concepts in the sections above. To depict it:
+
+<img style="max-width: 800px" src="https://docs.google.com/drawings/d/1Ww8ySlUTHR4IjK46etAa5r3KPfoDbJHY_A4ZKYD87sU/pub?w=949&h=461" />
+
 
 ---
 
@@ -906,6 +949,12 @@ It will soon leave lots of **intermittent errors** because every time when the e
 
 ---
 
+This is because **asynchronous steps in the event handlers** are not guaranteed to be done before the next handler get invoked:
+
+<img style="max-width: 800px" src="https://docs.google.com/drawings/d/1OKnt07WFC2NxawUAGOQYrUxVXhSa0G1fO6mKib7j_Ys/pub?w=982&h=457" />
+
+---
+
 Moreover, unless the `writeContent` is an entirely synchronous operation which blocks the main thread and events,
 **to assume it is fast enough to avoid debugging intermittent errors is impractical**,
 particularly when the program is running on the usually much slower integration test environment.
@@ -947,7 +996,7 @@ plus to return the `Promise` in a `then` step to block it before the writing is 
 
 ---
 
-## Conclusion
+## Recap
 
 Although there are some advanced features in the latest ECMAScript to simplify the work of asynchronous programming,
 `Promise` is still the most common low-level tool to manage callback and event based APIs.

@@ -78,6 +78,12 @@ Readers might hear of `WebWorker` before, but please note that it is **not** in 
 
 ---
 
+For the single-threading and asynchronous model, there is a diagram explains that well:
+
+<img style="max-width: 500px" src="http://exploringjs.com/es6/images/async----event_loop.jpg" />
+
+---
+
 ### Prototype-based
 
 It is a recognized Object Orient paradigm to construct different and instantiable types via extending prototypes:
